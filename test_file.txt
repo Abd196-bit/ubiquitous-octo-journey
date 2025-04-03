@@ -1,1 +1,1 @@
-Test file content
+This is a test file

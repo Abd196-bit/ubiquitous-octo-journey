@@ -30,7 +30,7 @@ const users = pgTable('users', {
 
 const files = pgTable('files', {
   id: serial('id').primaryKey(),
-  userId: serial('user_id').references(() => users.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
   originalName: varchar('original_name', { length: 255 }).notNull(),
   fileName: varchar('file_name', { length: 255 }).notNull().unique(),
   filePath: text('file_path').notNull(),
