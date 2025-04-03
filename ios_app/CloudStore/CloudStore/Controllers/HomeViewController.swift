@@ -23,7 +23,8 @@ class HomeViewController: UIViewController {
     
     private let welcomeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -31,7 +32,11 @@ class HomeViewController: UIViewController {
     private let storageUsageView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 16
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 4
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -39,7 +44,7 @@ class HomeViewController: UIViewController {
     private let storageUsageLabel: UILabel = {
         let label = UILabel()
         label.text = "Storage Usage"
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,15 +53,17 @@ class HomeViewController: UIViewController {
         let progressView = UIProgressView(progressViewStyle: .bar)
         progressView.trackTintColor = .systemGray5
         progressView.progressTintColor = .systemBlue
-        progressView.layer.cornerRadius = 4
+        progressView.layer.cornerRadius = 6
         progressView.clipsToBounds = true
+        progressView.layer.borderWidth = 0.5
+        progressView.layer.borderColor = UIColor.systemGray4.cgColor
         progressView.translatesAutoresizingMaskIntoConstraints = false
         return progressView
     }()
     
     private let storageDetailsLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -219,23 +226,48 @@ class HomeViewController: UIViewController {
     
     private func createQuickActionButton(title: String, imageName: String) -> UIButton {
         let button = UIButton(type: .system)
+        
+        // Add gradient background
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor.systemBlue.withAlphaComponent(0.1).cgColor,
+            UIColor.systemBlue.withAlphaComponent(0.05).cgColor
+        ]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.cornerRadius = 16
+        button.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Add shadows and styling
         button.backgroundColor = .secondarySystemBackground
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 16
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 3)
+        button.layer.shadowOpacity = 0.1
+        button.layer.shadowRadius = 5
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.3).cgColor
         
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        let imageView = UIImageView(image: UIImage(systemName: imageName))
+        // Using larger, filled SF Symbols for better visibility
+        let config = UIImage.SymbolConfiguration(pointSize: 32, weight: .medium)
+        let filledImageName = imageName + ".fill"
+        let image = UIImage(systemName: filledImageName, withConfiguration: config) ?? 
+                   UIImage(systemName: imageName, withConfiguration: config)
+                   
+        let imageView = UIImageView(image: image)
         imageView.tintColor = .systemBlue
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         let label = UILabel()
         label.text = title
-        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         
         stackView.addArrangedSubview(imageView)
@@ -244,14 +276,23 @@ class HomeViewController: UIViewController {
         button.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            imageView.heightAnchor.constraint(equalToConstant: 40),
-            imageView.widthAnchor.constraint(equalToConstant: 40),
+            imageView.heightAnchor.constraint(equalToConstant: 48),
+            imageView.widthAnchor.constraint(equalToConstant: 48),
             
             stackView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: button.centerYAnchor)
         ])
         
+        // Add frame resizing callback to update gradient
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.layoutIfNeeded()
+        
+        // Update gradient frame
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        gradientLayer.frame = button.bounds
+        CATransaction.commit()
+        
         return button
     }
     

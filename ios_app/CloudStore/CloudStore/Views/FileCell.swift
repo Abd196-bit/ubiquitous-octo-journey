@@ -8,7 +8,11 @@ class FileCell: UITableViewCell {
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = 12
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowRadius = 4
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -16,30 +20,58 @@ class FileCell: UITableViewCell {
     private let fileIconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        
+        // Use a circular background for the icon
+        imageView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+        imageView.layer.cornerRadius = 18
+        imageView.clipsToBounds = true
         imageView.tintColor = .systemBlue
+        
+        // Add subtle shadow
+        imageView.layer.shadowColor = UIColor.systemBlue.cgColor
+        imageView.layer.shadowOffset = CGSize(width: 0, height: 1)
+        imageView.layer.shadowOpacity = 0.2
+        imageView.layer.shadowRadius = 2
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
     private let fileNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let fileSizeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         label.textColor = .secondaryLabel
+        
+        // Create a pill-shaped badge for file size
+        label.backgroundColor = UIColor.systemGray6
+        label.layer.cornerRadius = 8
+        label.clipsToBounds = true
+        label.textAlignment = .center
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let fileDateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         label.textColor = .secondaryLabel
+        
+        // Add calendar icon
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(systemName: "clock")?.withTintColor(.secondaryLabel)
+        let attributedString = NSMutableAttributedString(attachment: attachment)
+        attributedString.append(NSAttributedString(string: " "))
+        label.attributedText = attributedString
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -100,10 +132,41 @@ class FileCell: UITableViewCell {
     
     func configure(with file: FileItem) {
         fileNameLabel.text = file.name
-        fileSizeLabel.text = file.formattedSize
-        fileDateLabel.text = file.formattedDate
         
-        // Set appropriate icon
-        fileIconImageView.image = UIImage(systemName: file.type.icon)
+        // Set size with padding for the pill-shaped badge
+        fileSizeLabel.text = "  \(file.formattedSize)  "
+        
+        // Create attributed string with clock icon
+        let attachment = NSTextAttachment()
+        let clockImage = UIImage(systemName: "clock")?.withTintColor(.secondaryLabel)
+        attachment.image = clockImage
+        let attributedString = NSMutableAttributedString(attachment: attachment)
+        attributedString.append(NSAttributedString(string: " \(file.formattedDate)"))
+        fileDateLabel.attributedText = attributedString
+        
+        // Set appropriate icon - try to use filled version if available
+        let filledIcon = file.type.icon + ".fill"
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .medium)
+        fileIconImageView.image = UIImage(systemName: filledIcon, withConfiguration: config) ?? 
+                                  UIImage(systemName: file.type.icon, withConfiguration: config)
+        
+        // Set icon background color based on file type
+        switch file.type {
+        case .image:
+            fileIconImageView.backgroundColor = UIColor.systemPink.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemPink
+        case .video:
+            fileIconImageView.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemPurple
+        case .document:
+            fileIconImageView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemBlue
+        case .audio:
+            fileIconImageView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemOrange
+        case .other:
+            fileIconImageView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemGray
+        }
     }
 }

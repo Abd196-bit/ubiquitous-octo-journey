@@ -7,8 +7,15 @@ class LoginViewController: UIViewController {
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(systemName: "icloud")
+        imageView.image = UIImage(systemName: "icloud.fill")
         imageView.tintColor = .systemBlue
+        
+        // Add shadow for depth
+        imageView.layer.shadowColor = UIColor.systemBlue.cgColor
+        imageView.layer.shadowOffset = CGSize(width: 0, height: 4)
+        imageView.layer.shadowOpacity = 0.3
+        imageView.layer.shadowRadius = 8
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -16,8 +23,12 @@ class LoginViewController: UIViewController {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "CloudStore"
-        label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 36, weight: .bold)
         label.textAlignment = .center
+        
+        // Add gradient text effect
+        label.textColor = .systemBlue
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -25,7 +36,7 @@ class LoginViewController: UIViewController {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Free up space on your device"
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = .secondaryLabel
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -37,7 +48,28 @@ class LoginViewController: UIViewController {
         textField.placeholder = "Email"
         textField.keyboardType = .emailAddress
         textField.autocapitalizationType = .none
-        textField.borderStyle = .roundedRect
+        
+        // Modern style with padding and shadow
+        textField.borderStyle = .none
+        textField.backgroundColor = .secondarySystemBackground
+        textField.layer.cornerRadius = 12
+        textField.layer.masksToBounds = true
+        
+        // Add padding
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        
+        // Add icon
+        let iconImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        iconImageView.image = UIImage(systemName: "envelope.fill")
+        iconImageView.tintColor = .systemBlue
+        iconImageView.contentMode = .scaleAspectFit
+        let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
+        iconContainer.addSubview(iconImageView)
+        textField.rightView = iconContainer
+        textField.rightViewMode = .always
+        
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -46,26 +78,68 @@ class LoginViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Password"
         textField.isSecureTextEntry = true
-        textField.borderStyle = .roundedRect
+        
+        // Modern style with padding and shadow
+        textField.borderStyle = .none
+        textField.backgroundColor = .secondarySystemBackground
+        textField.layer.cornerRadius = 12
+        textField.layer.masksToBounds = true
+        
+        // Add padding
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        
+        // Add icon
+        let iconImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        iconImageView.image = UIImage(systemName: "lock.fill")
+        iconImageView.tintColor = .systemBlue
+        iconImageView.contentMode = .scaleAspectFit
+        let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 20))
+        iconContainer.addSubview(iconImageView)
+        textField.rightView = iconContainer
+        textField.rightViewMode = .always
+        
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
     
     private let loginButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Log In", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        button.backgroundColor = .systemBlue
+        button.setTitle("Sign In", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        
+        // Create gradient background
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.systemBlue.cgColor, UIColor.systemIndigo.cgColor]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.cornerRadius = 16
+        button.layer.insertSublayer(gradientLayer, at: 0)
+        
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = 16
+        button.layer.shadowColor = UIColor.systemBlue.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 4)
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowRadius = 6
+        
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private let registerButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Create Account", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.setTitle("Create New Account", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(.systemBlue, for: .normal)
+        
+        // Add underline
+        let attributedString = NSMutableAttributedString(string: "Create New Account")
+        attributedString.addAttribute(NSAttributedString.Key.underlineStyle, 
+                                      value: NSUnderlineStyle.single.rawValue, 
+                                      range: NSRange(location: 0, length: attributedString.length))
+        button.setAttributedTitle(attributedString, for: .normal)
+        
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()

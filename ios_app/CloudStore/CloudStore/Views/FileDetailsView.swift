@@ -31,7 +31,11 @@ class FileDetailsView: UIView {
     private let headerView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 16
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowRadius = 8
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -39,17 +43,30 @@ class FileDetailsView: UIView {
     private let fileIconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        
+        // Create a circular background for the icon
+        imageView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+        imageView.layer.cornerRadius = 40
+        imageView.clipsToBounds = true
         imageView.tintColor = .systemBlue
+        
+        // Add subtle glow effect
+        imageView.layer.shadowColor = UIColor.systemBlue.cgColor
+        imageView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        imageView.layer.shadowOpacity = 0.2
+        imageView.layer.shadowRadius = 4
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
     private let fileNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textAlignment = .center
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingMiddle
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -57,28 +74,65 @@ class FileDetailsView: UIView {
     private let detailsView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 16
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowRadius = 8
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
+    private let detailsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 16
+        stackView.distribution = .fillEqually
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
     private let fileSizeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        
+        // Create an attributed string with icon
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(systemName: "arrow.down.doc.fill")?.withTintColor(.systemBlue)
+        let attributedString = NSMutableAttributedString(attachment: attachment)
+        attributedString.append(NSAttributedString(string: "  Size: "))
+        label.attributedText = attributedString
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let fileDateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        
+        // Create an attributed string with icon
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(systemName: "calendar")?.withTintColor(.systemBlue)
+        let attributedString = NSMutableAttributedString(attachment: attachment)
+        attributedString.append(NSAttributedString(string: "  Modified: "))
+        label.attributedText = attributedString
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let fileTypeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        
+        // Create an attributed string with icon
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(systemName: "doc.text.fill")?.withTintColor(.systemBlue)
+        let attributedString = NSMutableAttributedString(attachment: attachment)
+        attributedString.append(NSAttributedString(string: "  Type: "))
+        label.attributedText = attributedString
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -201,23 +255,58 @@ class FileDetailsView: UIView {
     
     private func createActionButton(title: String, imageName: String) -> UIButton {
         let button = UIButton(type: .system)
+        
+        // Modern button appearance
+        // Add gradient background
+        let gradientLayer = CAGradientLayer()
+        if title == "Delete" {
+            gradientLayer.colors = [
+                UIColor.systemRed.withAlphaComponent(0.2).cgColor,
+                UIColor.systemRed.withAlphaComponent(0.1).cgColor
+            ]
+        } else {
+            gradientLayer.colors = [
+                UIColor.systemBlue.withAlphaComponent(0.15).cgColor,
+                UIColor.systemBlue.withAlphaComponent(0.05).cgColor
+            ]
+        }
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.cornerRadius = 16
+        button.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Add styling
         button.backgroundColor = .secondarySystemBackground
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 16
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 3)
+        button.layer.shadowOpacity = 0.1
+        button.layer.shadowRadius = 4
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = title == "Delete" ? 
+            UIColor.systemRed.withAlphaComponent(0.3).cgColor : 
+            UIColor.systemBlue.withAlphaComponent(0.3).cgColor
         
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        let imageView = UIImageView(image: UIImage(systemName: imageName))
-        imageView.tintColor = .systemBlue
+        // Use filled version of SF Symbols if available
+        let config = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
+        let filledImageName = imageName + ".fill"
+        let image = UIImage(systemName: filledImageName, withConfiguration: config) ?? 
+                  UIImage(systemName: imageName, withConfiguration: config)
+                  
+        let imageView = UIImageView(image: image)
+        imageView.tintColor = title == "Delete" ? .systemRed : .systemBlue
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         let label = UILabel()
         label.text = title
-        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        label.textColor = title == "Delete" ? .systemRed : .systemBlue
         label.translatesAutoresizingMaskIntoConstraints = false
         
         stackView.addArrangedSubview(imageView)
@@ -226,14 +315,23 @@ class FileDetailsView: UIView {
         button.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            imageView.heightAnchor.constraint(equalToConstant: 30),
-            imageView.widthAnchor.constraint(equalToConstant: 30),
+            imageView.heightAnchor.constraint(equalToConstant: 32),
+            imageView.widthAnchor.constraint(equalToConstant: 32),
             
             stackView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: button.centerYAnchor)
         ])
         
+        // Add frame resizing callback to update gradient
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.layoutIfNeeded()
+        
+        // Update gradient frame
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        gradientLayer.frame = button.bounds
+        CATransaction.commit()
+        
         return button
     }
     
@@ -243,10 +341,68 @@ class FileDetailsView: UIView {
         self.file = file
         
         fileNameLabel.text = file.name
-        fileSizeLabel.text = "Size: \(file.formattedSize)"
-        fileDateLabel.text = "Modified: \(file.formattedDate)"
-        fileTypeLabel.text = "Type: \(file.type.rawValue.capitalized)"
-        fileIconImageView.image = UIImage(systemName: file.type.icon)
+        
+        // Update size label with icon
+        let sizeAttachment = NSTextAttachment()
+        sizeAttachment.image = UIImage(systemName: "arrow.down.doc.fill")?.withTintColor(.systemBlue)
+        let sizeAttributedString = NSMutableAttributedString(attachment: sizeAttachment)
+        sizeAttributedString.append(NSAttributedString(string: "  Size: \(file.formattedSize)"))
+        fileSizeLabel.attributedText = sizeAttributedString
+        
+        // Update date label with icon
+        let dateAttachment = NSTextAttachment()
+        dateAttachment.image = UIImage(systemName: "calendar")?.withTintColor(.systemBlue)
+        let dateAttributedString = NSMutableAttributedString(attachment: dateAttachment)
+        dateAttributedString.append(NSAttributedString(string: "  Modified: \(file.formattedDate)"))
+        fileDateLabel.attributedText = dateAttributedString
+        
+        // Update type label with icon
+        let typeAttachment = NSTextAttachment()
+        let typeIcon = getFileTypeIcon(for: file.type)
+        typeAttachment.image = UIImage(systemName: typeIcon)?.withTintColor(.systemBlue)
+        let typeAttributedString = NSMutableAttributedString(attachment: typeAttachment)
+        typeAttributedString.append(NSAttributedString(string: "  Type: \(file.type.rawValue.capitalized)"))
+        fileTypeLabel.attributedText = typeAttributedString
+        
+        // Set appropriate icon with a larger size
+        let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .medium)
+        let filledIcon = file.type.icon + ".fill"
+        fileIconImageView.image = UIImage(systemName: filledIcon, withConfiguration: config) ?? 
+                                 UIImage(systemName: file.type.icon, withConfiguration: config)
+                                 
+        // Set icon color based on file type
+        switch file.type {
+        case .image:
+            fileIconImageView.backgroundColor = UIColor.systemPink.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemPink
+        case .video:
+            fileIconImageView.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemPurple
+        case .document:
+            fileIconImageView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemBlue
+        case .audio:
+            fileIconImageView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemOrange
+        case .other:
+            fileIconImageView.backgroundColor = UIColor.systemGray.withAlphaComponent(0.15)
+            fileIconImageView.tintColor = .systemGray
+        }
+    }
+    
+    private func getFileTypeIcon(for type: FileType) -> String {
+        switch type {
+        case .image:
+            return "photo.fill"
+        case .video:
+            return "video.fill"
+        case .document:
+            return "doc.text.fill"
+        case .audio:
+            return "music.note"
+        case .other:
+            return "doc.fill"
+        }
     }
     
     // MARK: - Actions
